@@ -206,6 +206,11 @@ label.flabel{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:
 .modal-box p{font-size:13.5px;color:var(--mut);line-height:1.6}
 .modal-box textarea{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:11px;color:var(--txt);padding:10px 12px;font-family:inherit;font-size:14.5px;min-height:90px;resize:vertical}
 .modal-box .dacts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.uninstall-steps{margin:14px 0 4px;padding:0;list-style:none;counter-reset:ustep;display:flex;flex-direction:column;gap:12px}
+.uninstall-steps li{counter-increment:ustep;display:flex;gap:12px;align-items:flex-start;font-size:14.5px;line-height:1.6;color:var(--txt)}
+.uninstall-steps li::before{content:counter(ustep);flex:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1A1400;font-weight:800;font-size:14px;display:grid;place-items:center;margin-top:1px}
+.uninstall-steps li strong{color:var(--gold2)}
+.uninstall-note{margin-top:14px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.35);border-radius:12px;padding:11px 13px;font-size:13.5px;line-height:1.65;color:var(--txt)}
 </style>
 </head>
 <body>
@@ -285,6 +290,7 @@ label.flabel{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:
         <button type="button" data-lang="sd">سنڌي</button>
       </div>
       <button type="button" class="btn-ghost" id="sysBtn">📊 <span data-i18n="sysReport">System Report</span></button>
+      <button type="button" class="btn-ghost" id="uninstallBtn">🗑 Uninstall App</button>
       <button type="button" class="btn-ghost" id="logoutBtn" data-i18n="logout">Logout</button>
     </header>
 
@@ -368,6 +374,21 @@ label.flabel{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:
 </section>
 
 <div class="toast" id="toast" role="status"></div>
+
+<div class="modal-overlay hidden" id="uninstallModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="unTitle">
+    <h3 id="unTitle">🗑 Uninstall App</h3>
+    <p>Shizcon AI ko phone se hatana hai? Neeche diye gaye asaan steps follow karein — bilkul waise hi jaise pehle wali apps delete ki thin:</p>
+    <ol class="uninstall-steps">
+      <li><span>Home screen par <strong>Shizcon AI</strong> ke icon par <strong>long-press</strong> karein (thodi der dabaye rakhein) → jo menu khule, us mein <strong>“Uninstall”</strong> ya <strong>“Remove”</strong> tap karein → confirm kar dein. App phone se hat jayega.</span></li>
+      <li><span>Ya Chrome mein app khol kar upar <strong>⋮ (teen dots) menu</strong> tap karein → <strong>“Uninstall Shizcon AI”</strong> agar dikhe to usay tap karein. Agar ye na dikhe, to <strong>App info</strong> khol kar wahan se <strong>Uninstall</strong> karein.</span></li>
+    </ol>
+    <div class="uninstall-note">ℹ️ <strong>Note:</strong> Koi bhi web app / PWA khud apne aap ko phone se delete nahi kar sakta — is ka koi button browser mein hota hi nahi. Uninstall hamesha phone se hi hota hai, jaise pehle wali apps delete ki thin. Upar wale steps se app poori tarah hat jayega.</div>
+    <div class="dacts">
+      <button type="button" class="btn-red" id="unClose">Samajh gaya</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay hidden" id="agentModal">
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="adTitle">
@@ -688,6 +709,14 @@ $("googleBtn").addEventListener("click", function () {
   });
 });
 $("logoutBtn").addEventListener("click", function () { if (auth) auth.signOut(); });
+
+/* ===== Uninstall guide (web app khud delete nahi ho sakta — sirf steps) ===== */
+function openUninstallModal() { $("uninstallModal").classList.remove("hidden"); }
+function closeUninstallModal() { $("uninstallModal").classList.add("hidden"); }
+$("uninstallBtn").addEventListener("click", openUninstallModal);
+$("unClose").addEventListener("click", closeUninstallModal);
+$("uninstallModal").addEventListener("click", function (ev) { if (ev.target === $("uninstallModal")) closeUninstallModal(); });
+document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") closeUninstallModal(); });
 
 /* ===== Firestore helpers ===== */
 function col(name) { return db.collection("users").doc(uid).collection(name); }
